@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ url_for('static',filename='default.jpg') }}">
+        <div class="media-body">
+          <h2 class="account-heading"> Username </h2>
+          <p class="text-secondary">  User.email </p>
+        </div>
+      </div>
+    </div>
+
+      <div class="content-section">
+          <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="text" placeholder="Title" >
+              <input class="form-control mr-sm-2" type="text" placeholder="Subject" >
+              <input class="form-control mr-sm-2" type="email" placeholder="Recipient" >
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Scan</button>
+            </form>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="content-section">
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              </form>
+          </div>
+        
+          </div>
+    </div>
+</div>
+{% endblock content %}
