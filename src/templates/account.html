@@ -7,8 +7,8 @@
       <div class="media">
         <img class="rounded-circle account-img" src="{{ url_for('static',filename='default.jpg') }}">
         <div class="media-body">
-          <h2 class="account-heading"> Username </h2>
-          <p class="text-secondary">  User.email </p>
+          <h2 class="account-heading"> {{current_user.username}} </h2>
+          <p class="text-secondary">  {{current_user.email}} </p>
         </div>
       </div>
     </div>
@@ -29,7 +29,7 @@
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
               </form>
           </div>
-        
+
           </div>
     </div>
 </div>
