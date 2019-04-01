@@ -1,9 +1,29 @@
 from flask import Flask, render_template, url_for, flash, redirect
 from forms import RegistrationForm, LoginForm
+from flask_sqlalchemy import SQLAlchemy
+
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SECRET_KEY'] = 'h7h77g7'
+db = SQLAlchemy(app)
 
+mapping = db.Table('mapping',
+    db.Column('username',db.String(80),db.ForeignKey('user.username')),
+    db.Column('id',db.Integer,db.ForeignKey('files.id'))
+)
+
+class User(db.Model):
+    username = db.Column(db.String(80), primary_key=True)
+    email = db.Column(db.String(80),unique=True,nullable=False)
+    password = db.Column(db.String(80),nullable=False) 
+
+class Files(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(300))
+    data = db.Column(db.LargeBinary)
+    
 
 @app.route("/")
 @app.route("/home")
