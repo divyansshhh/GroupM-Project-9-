@@ -1,37 +1,42 @@
 {% extends "layout.html" %}
 {% block scan %}
 <script src="https://asprise.azureedge.net/scannerjs/scanner.js" type="text/javascript"></script>
+<script>
+    var com_asprise_scan_app_license = "ENTwJt8xMa3wVWon6qFOS17y7OUgMEkJE0hGIz+W6my+wlWY8tHknOWGTPt6eKB8Roo8Y00/yFflhY4FLmzLzvZOLMDlPdPlHo1ekZP8d1ur+kPoYYxxtyzKJ8P1f7vSJnjl1GjhDTBkmSRa3W/Gf2Y4nrZ3V90DNJOxHd2wjzicZ3L5rcrIYcpbgRUw2yD+wdRWPpJl9eWfaKrN9zKXJvBli2GdRti5vwyi8lwKjjq5i1QSKBaLGOJgt9KGWpTJzRjY8kLD9BweJusluxGW0/8Z2sP6DLBlF0QE6APhLqSfxM=";
+
+    function changeLicenseType(sel) { window.location.href = window.location.pathname + '?license=' + sel.value; }
+</script>
 
 <script>
     function scanToJpg() {
         scanner.scan(displayImagesOnPage,
-        {
-            "output_settings" :
-            [
-                {
-                    "type" : "return-base64",
-                    "format" : "jpg"
-                }
-            ]
-        });
+            {
+                "output_settings":
+                    [
+                        {
+                            "type": "return-base64",
+                            "format": "jpg"
+                        }
+                    ]
+            });
     }
     /** Processes the scan result */
     function displayImagesOnPage(successful, mesg, response) {
-    if(!successful) { // On error
-        console.error('Failed: ' + mesg);
-        return;
-    }
+        if (!successful) { // On error
+            console.error('Failed: ' + mesg);
+            return;
+        }
 
-    if(successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User canceled.
-        console.info('User canceled');
-        return;
-    }
+        if (successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User canceled.
+            console.info('User canceled');
+            return;
+        }
 
-    var scannedImages = scanner.getScannedImages(response, true, false); // returns an array of ScannedImage
-    for(var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
-        var scannedImage = scannedImages[i];
-        processScannedImage(scannedImage);
-    }
+        var scannedImages = scanner.getScannedImages(response, true, false); // returns an array of ScannedImage
+        for (var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
+            var scannedImage = scannedImages[i];
+            processScannedImage(scannedImage);
+        }
     }
 
     /** Images scanned so far. */
@@ -39,61 +44,79 @@
 
     /** Processes a ScannedImage */
     function processScannedImage(scannedImage) {
-    imagesScanned.push(scannedImage);
-    var elementImg = createDomElementFromModel( {
-        'name': 'img',
-        'attributes': {
-            'class': 'scanned',
-            'src': scannedImage.src
-        }
-    });
-    document.getElementById('images').appendChild(elementImg);
+        imagesScanned.push(scannedImage);
+        var elementImg = createDomElementFromModel({
+            'name': 'img',
+            'attributes': {
+                'class': 'scanned',
+                'src': scannedImage.src
+            }
+        });
+        document.getElementById('images').appendChild(elementImg);
     }
 </script>
 <style>
     img.scanned {
-        height: 200px; /** Sets the display size */
+        height: 200px;
+        /** Sets the display size */
         margin-right: 12px;
     }
+
     div#images {
         margin-top: 20px;
     }
 </style>
 {% endblock scan %}
+
+
 {% block content %}
 <div class="container">
-  <div class="row">
-    <div class="col-md-8">
-      <div class="content-section">
-      <div class="media">
-        <img class="rounded-circle account-img" src="{{ url_for('static',filename='default.jpg') }}">
-        <div class="media-body">
-          <h2 class="account-heading"> {{current_user.username}} </h2>
-          <p class="text-secondary">  {{current_user.email}} </p>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="content-section">
+                <div class="media">
+                    <img class="rounded-circle account-img" src="{{ url_for('static',filename='default.jpg') }}">
+                    <div class="media-body">
+                        <h2 class="account-heading"> {{current_user.username}} </h2>
+                        <p class="text-secondary"> {{current_user.email}} </p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="content-section">
+                    <h2>Scanner.js: Scan PDF to Form and then Submit</h2>
+
+                    <button type="button" onclick="scanToJpg();">Scan</button>
+                    <input type="button" class="btn btn-xs btn-primary" value="Submit" onclick="submitForm1();"
+                        style="float: right;">
+                    <div id="images"></div>
+                    <form class="form-inline my-2 my-lg-0">
+
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col-md-4">
+            <div class="content-section">
+                SHARE
+            </div>
+            <div class="content-section">
+                {% for file in data %}
+                <div>
+                    {{file.id}}
+                    <a href={{ url_for('download', file_id=file.id) }}>{{file.name}}</a>
+                    <a href={{ url_for('share' , file_id=file.id)}}>share</a>
+                </div>
+                {%endfor%}
+            </div>
+
+        </div>
+
     </div>
-
-      <button type="button" onclick="scanToJpg();">Scan</button>
-      <div id="images"></div>
-      <div class="col-md-4">
-        <div class="content-section">
-            <h2>Scanner.js: Scan PDF to Form and then Submit</h2>
-
-            <button type="button" onclick="scanToJpg();">Scan</button>
-        
-            <div id="images"></div>
-            <form class="form-inline my-2 my-lg-0">
-
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </form>
-
-          </div>
-          </div>
-    </div>
-    {% for file in data %}
-        <a href={{url_for('download/{{file.id}}')}}>file.name</a>
-    {%endfor%}
 </div>
+
 {% endblock content %}

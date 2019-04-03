@@ -53,6 +53,8 @@ def about():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('account'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password=generate_password_hash(form.password.data,method='sha256')
@@ -65,6 +67,8 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('account'))
     form = LoginForm()
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
@@ -95,9 +99,9 @@ def upload():
     db.session.commit()
     return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
 
-@app.route("/share")
+@app.route("/share/<int:file_id>")
 @login_required
-def share():                #assuming file_id is given
+def share(file_id):                #assuming file_id is given
     form = ShareForm()
     file = Files.query.filter_by(id=file_id)
     if form.validate_on_submit():
@@ -109,10 +113,10 @@ def share():                #assuming file_id is given
     mail_func(form,file_name)
     return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
 
-@app.route("/download/<file_id>")
+@app.route("/download/<int:file_id>")
 def download(file_id):
     file_data = Files.query.filter_by(id=file_id).first()
-    return send_file(BytesIO(file_data.data), attachment_filename = "pdf.pdf", as_attachment=True)
+    return send_file(BytesIO(file_data.data), attachment_filename = file_data.name, as_attachment=True)
 
 @app.route('/logout')
 @login_required
