@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, FieldList
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -18,3 +18,9 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+class ShareForm(FlaskForm):
+    recipient_email = FieldList(StringField('RecipientEmail',validators=[DataRequired(),Email()]),min_entries=1)
+    subject = StringField('Subject', validators=[DataRequired()])
+    sender_name= StringField('SenderName', validators=[DataRequired()])
+    body = StringField('Body')

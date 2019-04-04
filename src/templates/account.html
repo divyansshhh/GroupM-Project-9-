@@ -93,7 +93,7 @@
           </div>
     </div>
     {% for file in data %}
-        {{file.id}}
+        <a href={{url_for('download/{{file.id}}')}}>file.name</a>
     {%endfor%}
 </div>
 {% endblock content %}

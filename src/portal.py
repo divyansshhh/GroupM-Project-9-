@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect, request,send_file
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, ShareForm
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -97,17 +97,21 @@ def upload():
 
 @app.route("/share")
 @login_required
-def share():
+def share():                #assuming file_id is given
     form = ShareForm()
+    file = Files.query.filter_by(id=file_id)
     if form.validate_on_submit():
-        for recipient in form['recipient_email']:
+        for recipient in form.recipient_email.data:
             user = User.query.filter_by(email=recipient).first()
             if user is not None:
+                user.mapping.append(file)
                 
+    mail_func(form,file_name)
+    return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
 
-@app.route("/download")
-def download():
-    file_data = Files.query.filter_by(id=1).first()
+@app.route("/download/<file_id>")
+def download(file_id):
+    file_data = Files.query.filter_by(id=file_id).first()
     return send_file(BytesIO(file_data.data), attachment_filename = "pdf.pdf", as_attachment=True)
 
 @app.route('/logout')
@@ -132,24 +136,21 @@ def mail_func(form, file_name):
     email_user = 'id'
     email_password = 'password'
     email_send = form['recipient_email']
-    # email_Cc = form['Cc']
     subject = form['subject']
 
     msg = MIMEMultipart()
     msg['From'] = email_user
     msg['To'] = ", ".join(email_send)
     msg['Subject'] = subject
-    # msg['Cc'] = ", ".join(email_Cc)
 
     body = 'Sent by ' + form['sender_name'] + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
     msg.attach(MIMEText(body,'plain'))
     
-    attachment  = open(file_name,'rb')
 
     part = MIMEBase('application','octet-stream')
-    part.set_payload((attachment).read())
+    part.set_payload(file_name)
     encoders.encode_base64(part)
-    part.add_header('Content-Disposition',"attachment; filename= " + file_name)
+    part.add_header('Content-Disposition',"attachment; filename= Document.pdf")
 
     msg.attach(part)
     text = msg.as_string()
@@ -157,9 +158,7 @@ def mail_func(form, file_name):
     server.starttls()
     server.login(email_user, email_password)
 
-
     server.sendmail(email_user, email_send , text)
     server.quit()
-
-if __name__ == '__main__':
+if __name__ == '__main__':        
     app.run(debug=True)
