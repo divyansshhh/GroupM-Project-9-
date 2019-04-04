@@ -11,9 +11,9 @@
                         "type": "upload",
                         "format": "pdf",
                         "upload_target": {
-                            "url": "https://asprise.com/scan/applet/upload.php?action=dump",
+                            "url": "http://localhost:5000/upload?userid={{current_user.user_id}}",
                             "post_fields": {
-                                "sample-field": "Test scan"
+                                "filename":document.getElementById("filename").value
                             },
                             "cookies": document.cookie,
                             "headers": [
@@ -162,7 +162,9 @@
             </div>
             <div>
                 <h2>Scanner.js: Scan and Upload Directly</h2>
-
+                <div class="form-group">
+                    <input type="text" placeholder="Enter filename" class="form-control" id="filename"/>
+                </div>
                 <button type="button" onclick="scanAndUploadDirectly();">Scan and Upload</button>
 
                 <div id="server_response"></div>

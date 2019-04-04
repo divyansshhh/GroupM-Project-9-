@@ -90,14 +90,17 @@ def account():
     return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
 
 @app.route("/upload",methods=['POST'])
-@login_required
 def upload():
-    file = request.files['inputFile']            # add tag of file here
-    newFile = Files(name=file.filename,data=file.read())
+    userid = request.args.get("userid")
+    current_user = User.query.filter_by(user_id=userid).first()
+    file = request.files['asprise_scans']            # add tag of file here
+    filename = request.form.get("filename")
+    newFile = Files(name=filename,data=file.read())
     db.session.add(newFile)
     newFile.mapping.append(current_user)
     db.session.commit()
-    return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
+    # return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
+    return "Upload Success. Please reload the page."
 
 @app.route("/share/<int:file_id>")
 @login_required
