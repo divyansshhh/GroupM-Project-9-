@@ -15,6 +15,9 @@
     {% else %}
         <title>Portal</title>
     {% endif %}
+    {% if current_user.is_authenticated %}
+      {% block scan %}{% endblock %}
+    {% endif %}
 </head>
 <body>
     <header class="site-header">
