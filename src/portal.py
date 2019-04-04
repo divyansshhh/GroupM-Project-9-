@@ -76,10 +76,14 @@ def login():
     return render_template('login.html', title='Login', form=form)
 
 
+def getdata(user_id):
+    user = User.query.filter_by(user_id=user_id).first()
+    return user.mapping
+
 @app.route("/account")
 @login_required
 def account():
-    return render_template('account.html', title='Account',current_user=current_user)
+    return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
 
 @app.route("/upload",methods=['POST'])
 def upload():

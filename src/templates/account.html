@@ -22,8 +22,10 @@
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
               </form>
           </div>
-
           </div>
     </div>
+    {% for file in data %}
+        {{file.name}}
+    {%endfor%}
 </div>
 {% endblock content %}
