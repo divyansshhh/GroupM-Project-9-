@@ -102,19 +102,38 @@ def upload():
     # return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
     return "Upload Success. Please reload the page."
 
-@app.route("/share/<int:file_id>")
+@app.route("/share/<int:file_id>",methods=['GET','POST'])
 @login_required
 def share(file_id):                #assuming file_id is given
-    form = ShareForm()
-    file = Files.query.filter_by(id=file_id)
-    if form.validate_on_submit():
-        for recipient in form.recipient_email.data:
-            user = User.query.filter_by(email=recipient).first()
+    file = Files.query.filter_by(id=file_id).first()
+    # form = dict()
+    # form['recipient_email'] = []
+    # form['body'] = request.form['message']
+    # form['subject'] = request.form['subject']
+    # t = request.form['email'].replace(' ','')
+    # form['recipient_email'] = t.split(',') 
+    # print(form)
+    # mail_func(form,file.data)
+    form_data = ShareForm()
+    if form_data.validate_on_submit():
+        form = dict()
+        form['recipient_email'] = []
+        form['body'] = form_data.message.data
+        form['subject'] = form_data.subject.data
+        t1 = form_data.email.data
+        t = t1.replace(' ','')
+        form['recipient_email'] = t.split(',')
+        for emailid in form['recipient_email'] :
+            user = User.query.filter_by(email = emailid).first()
+            print(type(user))
             if user is not None:
-                user.mapping.append(file)
-                
-    mail_func(form,file_name)
-    return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
+                file.mapping.append(user)
+                db.session.commit()
+        print(form)
+        mail_func(form,file.data)
+        return redirect(url_for('login'))
+    
+    return render_template('share.html', title='SHARE',current_user=current_user, data = getdata(current_user.user_id), form_data=form_data)
 
 @app.route("/download/<int:file_id>")
 def download(file_id):
@@ -140,8 +159,8 @@ def mail_func(form, file_name):
 
     now = datetime.datetime.now()
 
-    email_user = 'id'
-    email_password = 'password'
+    email_user = ''
+    email_password = ''
     email_send = form['recipient_email']
     subject = form['subject']
 
@@ -150,7 +169,7 @@ def mail_func(form, file_name):
     msg['To'] = ", ".join(email_send)
     msg['Subject'] = subject
 
-    body = 'Sent by ' + form['sender_name'] + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
+    body = 'Sent by ' + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
     msg.attach(MIMEText(body,'plain'))
     
 
@@ -168,4 +187,4 @@ def mail_func(form, file_name):
     server.sendmail(email_user, email_send , text)
     server.quit()
 if __name__ == '__main__':        
-    app.run(debug=True)
+    app.run(host="0.0.0.0")

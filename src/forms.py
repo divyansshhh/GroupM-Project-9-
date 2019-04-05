@@ -20,7 +20,8 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class ShareForm(FlaskForm):
-    recipient_email = FieldList(StringField('RecipientEmail',validators=[DataRequired(),Email()]),min_entries=1)
-    subject = StringField('Subject', validators=[DataRequired()])
-    sender_name= StringField('SenderName', validators=[DataRequired()])
-    body = StringField('Body')
+    email = StringField('Recipient',validators=[DataRequired()])
+    subject = StringField('Subject',validators=[DataRequired()])
+    message = StringField('Message',validators=[DataRequired()])
+    send = SubmitField('Send')
+    

@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container">    
+        <div class="content-section">
+            <form method="POST" action="">
+                {{ form_data.hidden_tag() }}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Log In</legend>
+                    <div class="form-group">
+                        {{ form_data.email.label(class="form-control-label") }}
+                        {% if form_data.email.errors %}
+                            {{ form_data.email(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form_data.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form_data.email(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form_data.subject.label(class="form-control-label") }}
+                        {% if form_data.subject.errors %}
+                            {{ form_data.subject(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form_data.subject.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form_data.subject(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form_data.message.label(class="form-control-label") }}
+                        {% if form_data.message.errors %}
+                            {{ form_data.message(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form_data.message.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form_data.message(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    {{ form_data.send(class="btn btn-outline-info") }}
+                </div>
+            </form>
+        </div>
+ 
+    </div>
+
+{% endblock content %}
