@@ -159,8 +159,8 @@ def mail_func(form, file_name):
 
     now = datetime.datetime.now()
 
-    email_user = ''
-    email_password = ''
+    email_user = 'noreply.grpm.proj9@gmail.com'
+    email_password = 'doraemon_nobita'
     email_send = form['recipient_email']
     subject = form['subject']
 
