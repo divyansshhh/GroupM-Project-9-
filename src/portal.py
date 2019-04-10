@@ -94,7 +94,7 @@ def upload():
     userid = request.args.get("userid")
     current_user = User.query.filter_by(user_id=userid).first()
     file = request.files['asprise_scans']            # add tag of file here
-    filename = request.form.get("filename")
+    filename = request.form.get("filename") + ".pdf"
     newFile = Files(name=filename,data=file.read())
     db.session.add(newFile)
     newFile.mapping.append(current_user)

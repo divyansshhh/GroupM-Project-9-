@@ -37,8 +37,41 @@
         }
         document.getElementById('server_response').innerHTML = scanner.getUploadResponse(response);
     }
+    /** Initiates a scan */
+    function scanToLocalDisk() {
+            scanner.scan(displayResponseOnPage,
+                {
+                    "output_settings": [
+                        {
+                            "type": "save",
+                            "format": "pdf",
+                            "save_path": "${TMP}\\${TMS}${EXT}"
+                        }
+                    ]
+                }
+            );
+        }
+        function displayResponseOnPage(successful, mesg, response) {
+            if(!successful) { // On error
+                document.getElementById('response').innerHTML = 'Failed: ' + mesg;
+                return;
+            }
+            if(successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User cancelled.
+                document.getElementById('response').innerHTML = 'User cancelled';
+                return;
+            }
+            document.getElementById('response').innerHTML = scanner.getSaveResponse(response);
+        }
 </script>
-
+<style>
+        img.scanned {
+            height: 200px; /** Sets the display size */
+            margin-right: 12px;
+        }
+        div#images {
+            margin-top: 20px;
+        }
+    </style>
 {% endblock scan %}
 
 
@@ -56,10 +89,13 @@
                 </div>
             </div>
             <div>
-                <h2>Scanner.js: Scan and Upload Directly</h2>
+                <h2>Scan and Share</h2>
                 <div class="form-group">
                     <input type="text" placeholder="Enter filename" class="form-control" id="filename"/>
                 </div>
+                <button type="button" onclick="scanToLocalDisk();">Scan Local</button>
+
+                <div id="response"></div><hr>
                 <button type="button" onclick="scanAndUploadDirectly();">Scan and Upload</button>
 
                 <div id="server_response"></div>
