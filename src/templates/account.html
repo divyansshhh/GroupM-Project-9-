@@ -3,6 +3,24 @@
 <script src="https://asprise.azureedge.net/scannerjs/scanner.js" type="text/javascript"></script>
 
 <script>
+    function checkandupload() {
+        if(document.getElementById('filename').value == '') {
+            alert("Please Enter filename");
+            return false;
+        }
+        else {
+            scanAndUploadDirectly();
+        }
+    }
+    function checkandscanlocal() {
+        if(document.getElementById('filename').value == '') {
+            alert("Please Enter filename");
+            return false;
+        }
+        else {
+             scanToLocalDisk();
+        }
+    }
     function scanAndUploadDirectly() {
         scanner.scan(displayServerResponse,
             {
@@ -11,7 +29,7 @@
                         "type": "upload",
                         "format": "pdf",
                         "upload_target": {
-                            "url": "http://192.168.43.38:5000/upload?userid={{current_user.user_id}}",
+                            "url": "http://localhost:5000/upload?userid={{current_user.user_id}}",
                             "post_fields": {
                                 "filename":document.getElementById("filename").value
                             },
@@ -83,8 +101,7 @@
                 <div class="media">
                     <img class="rounded-circle account-img" src="{{ url_for('static',filename='default.jpg') }}">
                     <div class="media-body">
-                        <h2 class="account-heading"> {{current_user.username}} </h2>
-                        <p class="text-secondary"> {{current_user.email}} </p>
+                        <h3 class="account-heading" style="padding-top: 50px;"> {{current_user.email}} </h3>
                     </div>
                 </div>
             </div>
@@ -93,10 +110,10 @@
                 <div class="form-group">
                     <input type="text" placeholder="Enter filename" class="form-control" id="filename"/>
                 </div>
-                <button type="button" onclick="scanToLocalDisk();">Scan Local</button>
+                <button type="button" class="btn btn-success" onclick="checkandscanlocal();">Scan Local</button>
 
                 <div id="response"></div><hr>
-                <button type="button" onclick="scanAndUploadDirectly();">Scan and Upload</button>
+                <button type="button" class="btn btn-success" onclick="checkandupload();">Scan and Upload</button>
 
                 <div id="server_response"></div>
 
@@ -104,11 +121,11 @@
         </div>
         <div class="col-md-4">
             <div class="content-section">
-                {% for i in range(0,data|length) %}
+                {% for file in data %}
                 <div>
-                    {{data[i].id}}
-                    <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a><p>-{{dates[i]}}</p>
-                    <a href={{ url_for('share', file_id=data[i].id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
+                    {{file.id}}
+                    <a href={{ url_for('download', file_id=file.id) }}>{{file.name}}</a>
+                    <a href={{ url_for('share', file_id=file.id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
                         <sup><img width=12
                                     class="rounded-circle account-img"
                                     src="{{ url_for('static',filename='share.png') }}">
