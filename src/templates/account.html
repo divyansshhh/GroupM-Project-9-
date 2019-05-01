@@ -29,6 +29,7 @@
                         "type": "upload",
                         "format": "pdf",
                         "upload_target": {
+                            "url": "http://192.168.43.38:5000/upload?userid={{current_user.user_id}}",
                             "url": "http://localhost:5000/upload?userid={{current_user.user_id}}",
                             "post_fields": {
                                 "filename":document.getElementById("filename").value
@@ -121,11 +122,11 @@
         </div>
         <div class="col-md-4">
             <div class="content-section">
-                {% for file in data %}
+                {% for i in range(0,data|length) %}
                 <div>
-                    {{file.id}}
-                    <a href={{ url_for('download', file_id=file.id) }}>{{file.name}}</a>
-                    <a href={{ url_for('share', file_id=file.id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
+                    {{data[i].id}}
+                    <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a><p>-{{dates[i]}}</p>
+                    <a href={{ url_for('share', file_id=data[i].id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
                         <sup><img width=12
                                     class="rounded-circle account-img"
                                     src="{{ url_for('static',filename='share.png') }}">
