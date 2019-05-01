@@ -161,6 +161,29 @@ def upload():
 @login_required
 def share(file_id):                #assuming file_id is given
     file = Files.query.filter_by(id=file_id).first()
+    form_data = ShareForm()
+    if form_data.validate_on_submit():
+        form = dict()
+        form['recipient_email'] = []
+        form['body'] = form_data.message.data
+        form['subject'] = form_data.subject.data
+        t1 = form_data.email.data
+        t = t1.replace(' ','')
+        form['recipient_email'] = t.split(',')
+        for emailid in form['recipient_email'] :
+            user = User.query.filter_by(email = emailid).first()
+            print(type(user))
+            if user is not None:
+                file.mapping.append(user)
+                db.session.commit()
+     
+     credentials = GoogleCredentials(flask.session['credentials'])    
+     service = build('gmail','v1',credentials=credentials)
+     import send_email
+     sendInst = send_email.send_email(service)
+     message = sendInst.create_message_with_attachment(form, 'bellman_ford.cpp')
+     print(sendInst.send_message('me',message))
+
     return 
 
 @app.route("/download/<int:file_id>")
