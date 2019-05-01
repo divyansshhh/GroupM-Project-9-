@@ -124,7 +124,6 @@
             <div class="content-section">
                 {% for i in range(0,data|length) %}
                 <div>
-                    {{data[i].id}}
                     <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a>-{{dates[i]}}
                     <a href={{ url_for('share', file_id=data[i].id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
                         <sup><img width=12
