@@ -30,7 +30,7 @@ class send_email:
       
       email_send = form['recipient_email']
       subject = form['subject']
-      body = 'Sent by ' + 'Chicken Friedrice' + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
+      body = 'Sent via ' + 'ScanUpload' + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
 
       message = MIMEMultipart()
       message['to'] = ", ".join(email_send)
