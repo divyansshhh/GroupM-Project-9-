@@ -156,18 +156,8 @@
             <div class="content-section" style="overflow: auto; max-height: 80%;">
                 {% for i in range(0,data|length) %}
                 <div>
-<<<<<<< HEAD
-                    <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a>-{{dates[i]}}
-                    <a href={{ url_for('share', file_id=data[i].id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
-                        <sup><img width=12
-                                    class="rounded-circle account-img"
-                                    src="{{ url_for('static',filename='share.png') }}">
-                            </sup></button></a>
-
-=======
                     <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a>-<span>{{dates[i]}}</span>
                     <a href={{ url_for('share', file_id=data[i].id) }}><i class="fas fa-share"></i></a>
->>>>>>> 1432f7e3c8615b54e1dc692e78384513178b79a7
                 </div>
                 {% endfor %}
                 <!-- <div>
