@@ -50,9 +50,9 @@ mapped = db.Table('mapping',
 
 class User(UserMixin,db.Model):
     user_id=db.Column(db.Integer,primary_key=True)
-    username=db.Column(db.String(20),unique=True)
+    # username=db.Column(db.String(20),unique=True)
     email=db.Column(db.String(50),unique=True)
-    password=db.Column(db.String(80))
+    # password=db.Column(db.String(80))
     mapping = db.relationship('Files',secondary=mapped, backref = db.backref('mapping',lazy='dynamic'))
     def get_id(self):
         return (self.user_id)
