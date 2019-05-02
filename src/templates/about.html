@@ -1,7 +1,59 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container">
-    <h1>About PAGE</h1>
-</div>
+<div class="container" id="wrap">
+    <p>
+        This website was developed as a part of our CS 258 (Software Engineering Lab) course.
+        The main purpose of this app is to ease the sharing of documents between people,
+        With the help of this app, now you can directly scan documents from your browser and share the documents with via email.
+        Just login with your google account and start sharing.
+    </p>
+    <h3>Contributors :</h3>
+    <br>
+    <ul>
+        <li>Ronak Bandwal  (cse170001041@iiti.ac.in)</li>
+        <li>Divyansh Choudhary  (cse170001023@iiti.ac.in)</li>
+        <li>Vaibhav Anand  (cse1700053@iiti.ac.in)</li>
+        <li>Mohit Chauhan  (cse170001029@iiti.ac.in)</li>
 
+    </ul>
+</div>
+<div class="footer">
+        <!-- <h5 class="text-uppercase" style="color:white; padding-top:10px;">Links</h5> -->
+    
+                <ul class="list-unstyled" style="padding-top:10px;padding-left: 50px; float: left;">
+                  <li>
+                    <a href="http://iiti.ac.in" style="color:white;">IITI Home Page</a>
+                  </li>
+                </ul>
+            <span style="float:right;padding-right:50px;padding-top:10px;">All Rights Reserved</span>
+    </div>
+<style>
+    
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+    body {
+        background: rgb(237,237,237);
+    }
+    li {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 600;
+    }
+    .footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #00695c;
+  color: white;
+  text-align: center;
+}
+    p {
+        margin-top: 50px;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 600;
+    }
+    #wrap {
+        width: 50%;
+        background: rgb(237,237,237);
+    }
+</style>
 {% endblock content %}

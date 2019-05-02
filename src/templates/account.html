@@ -88,22 +88,52 @@
             height: 200px; /** Sets the display size */
             margin-right: 12px;
         }
+        body {
+            background: rgb(237,237,237);
+        }
         div#images {
             margin-top: 20px;
         }
+        #wrapper {
+            border: black;
+            border-style: solid;
+            border-width: 0.5px;
+            padding: 25px;
+            background: white;
+        }
+        span {
+            font-size: 0.8rem;
+        }
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+        li {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 600;
+    }
+    .footer span {
+        font-size: 1rem;
+    }
+        .footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #00695c;
+  color: white;
+  text-align: center;
+}
     </style>
 {% endblock scan %}
 
 
 {% block content %}
-<div class="container">
+<div class="container" id="wrapper">
     <div class="row">
         <div class="col-md-8">
             <div class="content-section">
                 <div class="media">
-                    <img class="rounded-circle account-img" src="{{ url_for('static',filename='default.jpg') }}">
+                    <div><i class="fas fa-user-circle fa-10x"></i></div>
                     <div class="media-body">
-                        <h3 class="account-heading" style="padding-top: 50px;"> {{current_user.email}} </h3>
+                        <h3 class="account-heading" style="padding-top: 50px; padding-left: 10px;"> {{current_user.email}} </h3>
                     </div>
                 </div>
             </div>
@@ -112,7 +142,7 @@
                 <div class="form-group">
                     <input type="text" placeholder="Enter filename" class="form-control" id="filename"/>
                 </div>
-                <button type="button" class="btn btn-success" onclick="checkandscanlocal();">Scan Local</button>
+                <button type="button" class="btn btn-sm btn-success" onclick="checkandscanlocal();">Scan Local</button>
 
                 <div id="response"></div><hr>
                 <button type="button" class="btn btn-success" onclick="checkandupload();">Scan and Upload</button>
@@ -121,10 +151,12 @@
 
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="content-section">
+        <div class="col-md-4" style="max-height: 500px;">
+            <h3>Shared/Received Files</h3>
+            <div class="content-section" style="overflow: auto; max-height: 80%;">
                 {% for i in range(0,data|length) %}
                 <div>
+<<<<<<< HEAD
                     <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a>-{{dates[i]}}
                     <a href={{ url_for('share', file_id=data[i].id) }}><button style="background-color:#ffffff;padding: 0;border: none;background: none;" ">
                         <sup><img width=12
@@ -132,14 +164,31 @@
                                     src="{{ url_for('static',filename='share.png') }}">
                             </sup></button></a>
 
+=======
+                    <a href={{ url_for('download', file_id=data[i].id) }}>{{data[i].name}}</a>-<span>{{dates[i]}}</span>
+                    <a href={{ url_for('share', file_id=data[i].id) }}><i class="fas fa-share"></i></a>
+>>>>>>> 1432f7e3c8615b54e1dc692e78384513178b79a7
                 </div>
                 {% endfor %}
-
+                <!-- <div>
+                    <a>Test</a>-<span>27.08.2019</span>
+                    <a href="/"><i class="fas fa-share"></i></a>
+                </div> -->
             </div>
         </div>
     </div>
 
 </div>
+<div class="footer">
+        <!-- <h5 class="text-uppercase" style="color:white; padding-top:10px;">Links</h5> -->
+    
+                <ul class="list-unstyled" style="padding-top:10px;padding-left: 50px; float: left;">
+                  <li>
+                    <a href="http://iiti.ac.in" style="color:white;">IITI Home Page</a>
+                  </li>
+                </ul>
+            <span style="float:right;padding-right:50px;padding-top:10px;">All Rights Reserved</span>
+    </div>
 </div>
 
 {% endblock content %}

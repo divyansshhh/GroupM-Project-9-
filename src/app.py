@@ -211,7 +211,7 @@ def share(file_id):  # assuming file_id is given
         sendInst = send_email.send_email(service)
         message = sendInst.create_message_with_attachment(form, file.data)
         print(sendInst.send_message('me', message))
-        return redirect(url_for("account"))
+        return redirect(url_for('account'))
     return render_template('share.html', title='SHARE', current_user=current_user, data=getdata(current_user.user_id), form_data=form_data)
 
 
