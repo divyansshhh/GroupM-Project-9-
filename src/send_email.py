@@ -30,7 +30,7 @@ class send_email:
       
       email_send = form['recipient_email']
       subject = form['subject']
-      body = 'Sent by ' + 'Chicken Friedrice' + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
+      body = 'Sent via ' + 'ScanUpload' + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
 
       message = MIMEMultipart()
       message['to'] = ", ".join(email_send)
@@ -39,7 +39,7 @@ class send_email:
       msg = MIMEText(body)
       message.attach(msg)
 
-      content_type, encoding = mimetypes.guess_type("bullshit.pdf")
+      content_type, encoding = mimetypes.guess_type("file.pdf")
       main_type, sub_type = content_type.split('/', 1)
 
       if content_type is None or encoding is not None:
