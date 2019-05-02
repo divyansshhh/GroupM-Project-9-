@@ -1,9 +1,13 @@
 from flask import Flask, render_template, url_for, flash, redirect, request,send_file
 from forms import RegistrationForm, LoginForm, ShareForm
+import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from io import BytesIO
+import sqlite3
+
+conn = sqlite3.connect('database.db',check_same_thread=False)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -19,7 +23,8 @@ def load_user(user_id):
 
 mapped = db.Table('mapping',
     db.Column('user_id',db.Integer,db.ForeignKey('user.user_id')),
-    db.Column('file_id',db.String(80),db.ForeignKey('files.id'))
+    db.Column('file_id',db.String(80),db.ForeignKey('files.id')),
+    db.Column('share_date',db.DateTime, default = datetime.today())
 )
 
 class User(UserMixin,db.Model):
@@ -33,7 +38,20 @@ class User(UserMixin,db.Model):
     def is_authenticated(self):
         return True
 
+def get_date(user_id,file_id):
+    qry = '''select share_date from mapping where user_id='%s' and file_id='%s'; ''' %(user_id,file_id)
+    dte = conn.execute(qry).fetchone()
+    print(dte[0])
+    return dte[0]
 
+
+def get_all_date(user_id):
+    dates = []
+    files = getdata(user_id)
+    for fil in files:
+        dates.append(get_date(user_id,fil.id))
+    print(dates)
+    return dates
 class Files(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(300))
@@ -82,12 +100,13 @@ def login():
 
 def getdata(user_id):
     user = User.query.filter_by(user_id=user_id).first()
+    print(user.mapping)
     return user.mapping
 
 @app.route("/account")
 @login_required
 def account():
-    return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id))
+    return render_template('account.html', title='Account',current_user=current_user, data = getdata(current_user.user_id), dates=get_all_date(current_user.user_id))
 
 @app.route("/upload",methods=['POST'])
 def upload():
