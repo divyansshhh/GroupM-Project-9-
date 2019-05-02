@@ -45,7 +45,7 @@ def load_user(user_id):
 mapped = db.Table('mapping',
     db.Column('user_id',db.Integer,db.ForeignKey('user.user_id')),
     db.Column('file_id',db.String(80),db.ForeignKey('files.id')),
-    db.Column('share_date',db.DateTime, default = datetime.date.today())
+    db.Column('share_date',db.DateTime, default = datetime.datetime.today())
 )
 
 class User(UserMixin,db.Model):
@@ -231,4 +231,4 @@ def logout():
 
 if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')
