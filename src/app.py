@@ -144,8 +144,7 @@ def oauth2callback():
     if user:
         login_user(user)
     else:
-        new_user = User(username="test",
-                        email=results['emailAddress'], password="password")
+        new_user = User(email=results['emailAddress'])
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
