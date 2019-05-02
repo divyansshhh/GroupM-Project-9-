@@ -4,6 +4,17 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from io import BytesIO
+import os
+import flask
+import requests
+from googleapiclient.discovery import build
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+import os
+
+
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
@@ -12,6 +23,12 @@ db=SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+GOOGLE_APPLICATION_CREDENTIALS = "client_secret.json"
+
+SCOPES = ['https://mail.google.com/']
+
+app.secret_key = 'T7ob_-0j-dsp1pyDdt79HhbV'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -67,18 +84,56 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('account'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user=User.query.filter_by(email=form.email.data).first()
-        if user:
-            if check_password_hash(user.password,form.password.data):
-                login_user(user,remember=form.remember.data)
-                return redirect(url_for('account'))
-        return redirect(url_for('login'))
-    return render_template('login.html', title='Login', form=form)
 
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+     GOOGLE_APPLICATION_CREDENTIALS, scopes=SCOPES)
+
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+    authorization_url, state = flow.authorization_url(
+
+       access_type='offline',
+       include_granted_scopes='true')
+
+
+    flask.session['state'] = state
+
+    return flask.redirect(authorization_url)
+
+
+@app.route('/oauth2callback')
+def oauth2callback():
+
+  state = flask.session['state']
+
+  flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+      GOOGLE_APPLICATION_CREDENTIALS, scopes=SCOPES, state=state)
+  flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+  authorization_response = flask.request.url
+  flow.fetch_token(authorization_response=authorization_response)
+  credentials = flow.credentials
+  service = build('gmail','v1',credentials=credentials)
+  results = service.users().getProfile(userId='me').execute()
+  print(results)
+  user=User.query.filter_by(email=results['emailAddress']).first()
+  if user:
+      login_user(user)
+  else:
+      new_user=User(username="test",email=results['emailAddress'],password="password")
+      db.session.add(new_user)
+      db.session.commit()
+      login_user(new_user)
+  flask.session['credentials'] = credentials_to_dict(credentials)
+  return flask.redirect(flask.url_for('account'))
+
+def credentials_to_dict(credentials):
+  return {'token': credentials.token,
+          'refresh_token': credentials.refresh_token,
+          'token_uri': credentials.token_uri,
+          'client_id': credentials.client_id,
+          'client_secret': credentials.client_secret,
+          'scopes': credentials.scopes}
 
 def getdata(user_id):
     user = User.query.filter_by(user_id=user_id).first()
@@ -106,34 +161,7 @@ def upload():
 @login_required
 def share(file_id):                #assuming file_id is given
     file = Files.query.filter_by(id=file_id).first()
-    # form = dict()
-    # form['recipient_email'] = []
-    # form['body'] = request.form['message']
-    # form['subject'] = request.form['subject']
-    # t = request.form['email'].replace(' ','')
-    # form['recipient_email'] = t.split(',') 
-    # print(form)
-    # mail_func(form,file.data)
-    form_data = ShareForm()
-    if form_data.validate_on_submit():
-        form = dict()
-        form['recipient_email'] = []
-        form['body'] = form_data.message.data
-        form['subject'] = form_data.subject.data
-        t1 = form_data.email.data
-        t = t1.replace(' ','')
-        form['recipient_email'] = t.split(',')
-        for emailid in form['recipient_email'] :
-            user = User.query.filter_by(email = emailid).first()
-            print(type(user))
-            if user is not None:
-                file.mapping.append(user)
-                db.session.commit()
-        print(form)
-        mail_func(form,file.data)
-        return redirect(url_for('login'))
-    
-    return render_template('share.html', title='SHARE',current_user=current_user, data = getdata(current_user.user_id), form_data=form_data)
+    return 
 
 @app.route("/download/<int:file_id>")
 def download(file_id):
@@ -144,47 +172,8 @@ def download(file_id):
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
-
-def mail_func(form, file_name):
-    import smtplib
-    import datetime
-
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.base import MIMEBase
-    from email import encoders
-
-
-    now = datetime.datetime.now()
-
-    email_user = 'noreply.grpm.proj9@gmail.com'
-    email_password = 'doraemon_nobita'
-    email_send = form['recipient_email']
-    subject = form['subject']
-
-    msg = MIMEMultipart()
-    msg['From'] = email_user
-    msg['To'] = ", ".join(email_send)
-    msg['Subject'] = subject
-
-    body = 'Sent by ' + '\n' + now.strftime("%Y-%m-%d %H:%M") + '\n' + form['body']
-    msg.attach(MIMEText(body,'plain'))
-    
-
-    part = MIMEBase('application','octet-stream')
-    part.set_payload(file_name)
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition',"attachment; filename= Document.pdf")
-
-    msg.attach(part)
-    text = msg.as_string()
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(email_user, email_password)
-
-    server.sendmail(email_user, email_send , text)
-    server.quit()
 if __name__ == '__main__':        
-    app.run(host="0.0.0.0")
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    app.run(debug=True)
