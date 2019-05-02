@@ -228,7 +228,12 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route("/test")
+def timer():
+    import time
+    time.sleep(5)
+    return "dsgdsg"
 
 if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True,host='0.0.0.0', port=os.environ['PORT'])
