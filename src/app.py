@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect, request, send_file
-from forms import RegistrationForm, LoginForm, ShareForm
+from forms import RegistrationForm, LoginForm, ShareForm, NameForm
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -50,7 +50,7 @@ mapped = db.Table('mapping',
 
 class User(UserMixin,db.Model):
     user_id=db.Column(db.Integer,primary_key=True)
-    # username=db.Column(db.String(20),unique=True)
+    username=db.Column(db.String(20))
     email=db.Column(db.String(50),unique=True)
     # password=db.Column(db.String(80))
     mapping = db.relationship('Files',secondary=mapped, backref = db.backref('mapping',lazy='dynamic'))
@@ -139,6 +139,7 @@ def oauth2callback():
     credentials = flow.credentials
     service = build('gmail', 'v1', credentials=credentials)
     results = service.users().getProfile(userId='me').execute()
+    intable = True
     print(results)
     user = User.query.filter_by(email=results['emailAddress']).first()
     if user:
@@ -148,9 +149,22 @@ def oauth2callback():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
+        intable = False
     flask.session['credentials'] = credentials_to_dict(credentials)
+    if not intable:
+        return redirect(url_for('getname'))
     return flask.redirect(flask.url_for('account'))
 
+@app.route('/getname')
+@login_required
+def getname():
+    form_data = NameForm()
+    if form_data.validate_on_submit():
+        username = form_data.name.data
+        user = User.query.filter_by(user_id=current_user.user_id).first()
+        user.username = username
+        db.session.commit()
+        return flask.redirect(url_for('account'))
 
 def credentials_to_dict(credentials):
     return {'token': credentials.token,
