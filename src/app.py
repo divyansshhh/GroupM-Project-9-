@@ -152,11 +152,13 @@ def oauth2callback():
         intable = False
     flask.session['credentials'] = credentials_to_dict(credentials)
     if not intable:
+        print('here')
+        # return render_template('share.html', title='SHARE', current_user=current_user, data=getdata(current_user.user_id), form_data=form_data)
         return redirect(url_for('getname'))
     return flask.redirect(flask.url_for('account'))
 
-@app.route('/getname')
-@login_required
+@app.route('/getname', methods = ['GET','POST'])
+# @login_required
 def getname():
     form_data = NameForm()
     if form_data.validate_on_submit():
@@ -165,6 +167,7 @@ def getname():
         user.username = username
         db.session.commit()
         return flask.redirect(url_for('account'))
+    return render_template('getname.html',form_data=form_data)
 
 def credentials_to_dict(credentials):
     return {'token': credentials.token,

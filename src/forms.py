@@ -27,4 +27,4 @@ class ShareForm(FlaskForm):
     
 class NameForm(FlaskForm):
     name = StringField('Name',validators=[DataRequired()])
-    send = SubmitField('Save')
+    send = SubmitField('Send')
